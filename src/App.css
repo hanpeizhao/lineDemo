@@ -41,3 +41,32 @@ a { color: #087f5b; font-size: .78rem; font-weight: 700; text-decoration: none; 
 .result-header { display: flex; justify-content: space-between; font-size: .8rem; }
 .result pre { overflow: auto; margin: 10px 0 0; white-space: pre-wrap; font-size: .8rem; }
 @media (min-width: 840px) { .api-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+@media (max-width: 767px) {
+  .App { padding: 16px 12px 48px; }
+  .hero { padding: 22px 18px; border-radius: 16px; }
+  .hero h1 { font-size: clamp(1.8rem, 10vw, 2.4rem); }
+  .eyebrow { letter-spacing: .1em; }
+  .runtime-status { gap: 6px; margin-top: 18px; }
+  .runtime-status span { padding: 6px 9px; }
+  .init-error { align-items: flex-start; flex-direction: column; gap: 5px; margin: 14px 0; padding: 12px 14px; }
+  .api-tabs { overflow-x: auto; justify-content: flex-start; margin-top: 18px; scrollbar-width: none; }
+  .api-tabs::-webkit-scrollbar { display: none; }
+  .api-tab { flex: 0 0 auto; min-height: 44px; padding: 10px 14px; white-space: nowrap; }
+  .group-list { gap: 28px; margin-top: 28px; }
+  .group-heading { margin-bottom: 11px; }
+  .group-heading h2 { font-size: 1.25rem; }
+  .group-heading p { line-height: 1.5; }
+  .api-grid { grid-template-columns: 1fr; gap: 12px; }
+  .api-card { padding: 16px; border-radius: 12px; }
+  .api-card-header { flex-direction: column; gap: 8px; }
+  .api-card-header > div { min-width: 0; width: 100%; }
+  .api-card-title-row { align-items: flex-start; }
+  .api-card h3 { overflow-wrap: anywhere; line-height: 1.35; }
+  .api-card-header a { align-self: flex-start; padding: 4px 0; }
+  .api-card button { width: 100%; min-height: 44px; }
+  .field input, .field textarea { max-width: 100%; }
+  .notice, .blocked { overflow-wrap: anywhere; line-height: 1.45; }
+  .result { max-width: 100%; overflow: hidden; }
+  .result pre { overflow-wrap: anywhere; word-break: break-word; }
+}
