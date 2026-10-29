@@ -30,6 +30,19 @@ LINE MINI App 的 Endpoint URL 必须使用 HTTPS，并且需要在 LINE Develop
 - In-app Purchase（Client）
 - In-app Purchase（Server）
 - Webhook Events
+- LIFF · SDK Properties
+- LIFF · Initialization
+- LIFF · Environment
+- LIFF · Login & Permissions
+- LIFF · User Profile
+- LIFF · Window
+- LIFF · Message
+- LIFF · QR Code
+- LIFF · Permanent Link
+- LIFF · Plugin & i18n
+- LIFF · MINI App Extensions
+
+当前 registry 覆盖 42 个可调用 API、3 个只读/启动阶段 API 项和 2 个 Webhook 事件。其中 LIFF 文档中的 `liff.getLanguage()`、`liff.permanentLink.createUrl()` 和 `liff.permanentLink.setExtraQueryParam()` 仍保留为兼容性测试项，并标注官方 deprecated 提示。
 
 服务消息和 IAP 服务端 API 当前通过安全占位 runner 展示。`VITE_SERVER_ADAPTER=true` 只表示前端允许进入服务端适配器状态；实际项目仍需要后端代理，并且 Channel Access Token 不得放入前端环境变量或浏览器存储。
 

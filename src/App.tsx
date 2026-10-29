@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import liff from "@line/liff";
 import ApiGroup from "./components/ApiGroup";
 import { miniAppApiRegistry } from "./api/registry";
+import { API_TABS, GROUPS_BY_TAB, type ApiTabId } from "./api/groups";
 import type { RunContext } from "./api/types";
 import "./App.css";
 
@@ -9,6 +10,7 @@ function App() {
   const [initialized, setInitialized] = useState(false);
   const [error, setError] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [activeTab, setActiveTab] = useState<ApiTabId>("mini-app");
 
   useEffect(() => {
     let active = true;
@@ -39,12 +41,15 @@ function App() {
     liff,
   }), [initialized, isLoggedIn]);
 
-  const groups = ["service-messages", "common-profile", "iap-client", "iap-server", "webhook"] as const;
+  const groups = GROUPS_BY_TAB[activeTab];
 
   return (
     <main className="App">
-      <header className="hero"><p className="eyebrow">LINE MINI APP</p><h1>API Playground</h1><p>按分组测试 LINE MINI App 专属 API，并查看运行条件与原始响应。</p><div className="runtime-status"><span className={initialized ? "status-ready" : "status-warn"}>{initialized ? "LIFF initialized" : "等待 LIFF 初始化"}</span><span>{isLoggedIn ? "已登录" : "未登录"}</span><span>{context.isInClient ? "LINE 客户端" : "外部浏览器"}</span></div></header>
+      <header className="hero"><p className="eyebrow">LINE 开发者测试台</p><h1>API 测试中心</h1><p>按分类测试 LINE MINI App 和 LIFF API，查看运行条件、参数和返回结果。</p><div className="runtime-status"><span className={initialized ? "status-ready" : "status-warn"}>{initialized ? "LIFF 已初始化" : "等待 LIFF 初始化"}</span><span>{isLoggedIn ? "已登录" : "未登录"}</span><span>{context.isInClient ? "LINE 客户端" : "外部浏览器"}</span></div></header>
       {error && <div className="init-error"><strong>初始化提示</strong><span>{error}</span></div>}
+      <nav className="api-tabs" aria-label="API 类型">
+        {API_TABS.map((tab) => <button key={tab.id} type="button" className={activeTab === tab.id ? "api-tab active" : "api-tab"} onClick={() => setActiveTab(tab.id)}>{tab.label}</button>)}
+      </nav>
       <div className="group-list">{groups.map((group) => <ApiGroup key={group} group={group} definitions={miniAppApiRegistry.filter((api) => api.group === group)} context={context} />)}</div>
     </main>
   );

@@ -4,7 +4,7 @@ import type { ApiDefinition, RunContext, RunResult } from "../api/types";
 import JsonEditor from "./JsonEditor";
 import ResultPanel from "./ResultPanel";
 
-const labels = { client: "CLIENT", server: "SERVER", event: "WEBHOOK" } as const;
+const labels = { client: "客户端", server: "服务端", event: "Webhook", property: "属性" } as const;
 type Props = { definition: ApiDefinition; context: RunContext };
 
 export default function ApiTestCard({ definition, context }: Props) {
@@ -23,9 +23,9 @@ export default function ApiTestCard({ definition, context }: Props) {
   }
 
   return <article className="api-card">
-    <header className="api-card-header"><div><div className="api-card-title-row"><h3>{definition.name}</h3><span className="tag">{labels[definition.kind]}</span></div><p>{definition.description}</p></div><a href={definition.docUrl} target="_blank" rel="noreferrer">DOCUMENT</a></header>
+    <header className="api-card-header"><div><div className="api-card-title-row"><h3>{definition.name}</h3><span className="tag">{labels[definition.kind]}</span></div><p>{definition.description}</p></div><a href={definition.docUrl} target="_blank" rel="noreferrer">查看文档</a></header>
     {definition.input.type !== "none" && <JsonEditor input={definition.input} value={payload} onChange={setPayload} disabled={running} />}
-    {definition.kind === "event" ? <p className="notice">Webhook 事件，仅展示 Payload 示例</p> : <><p className="notice">{definition.autoRun === false ? "需要手动运行，避免触发外部副作用。" : "可手动运行。"}</p>{runState.reasons.length > 0 && <p className="blocked">{runState.reasons.join("；")}</p>}<button type="button" onClick={run} disabled={!runState.canRun || running}>{running ? "RUNNING…" : "RUN"}</button></>}
+    {definition.kind === "event" ? <p className="notice">Webhook 事件，仅展示 Payload 示例</p> : !definition.runner ? <p className="notice">只读或启动阶段 API，由应用初始化流程处理。</p> : <><p className="notice">{definition.autoRun === false ? "需要手动运行，避免触发外部副作用。" : "可手动运行。"}</p>{runState.reasons.length > 0 && <p className="blocked">{runState.reasons.join("；")}</p>}<button type="button" onClick={run} disabled={!runState.canRun || running}>{running ? "运行中…" : "运行"}</button></>}
     <ResultPanel result={result} durationMs={durationMs} />
   </article>;
 }

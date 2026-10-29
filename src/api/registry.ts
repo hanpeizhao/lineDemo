@@ -1,10 +1,11 @@
 import { clientRunners } from "./clientRunners";
+import { liffApiRegistry } from "./liffRegistry";
 import { createUnavailableServerRunner } from "./serverRunners";
 import type { ApiDefinition } from "./types";
 
 const docs = "https://developers.line.biz/en/reference/line-mini-app/";
 
-export const miniAppApiRegistry: readonly ApiDefinition[] = [
+const miniAppApiRegistryBase: readonly ApiDefinition[] = [
   {
     id: "service-notification-token",
     group: "service-messages",
@@ -147,6 +148,11 @@ export const miniAppApiRegistry: readonly ApiDefinition[] = [
     requirements: [],
     autoRun: false,
   },
+];
+
+export const miniAppApiRegistry: readonly ApiDefinition[] = [
+  ...miniAppApiRegistryBase,
+  ...liffApiRegistry,
 ];
 
 export function getApiDefinition(id: string) {

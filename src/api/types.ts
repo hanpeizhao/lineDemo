@@ -5,9 +5,20 @@ export type ApiGroup =
   | "common-profile"
   | "iap-client"
   | "iap-server"
-  | "webhook";
+  | "webhook"
+  | "liff-properties"
+  | "liff-initialization"
+  | "liff-environment"
+  | "liff-auth"
+  | "liff-profile"
+  | "liff-window"
+  | "liff-message"
+  | "liff-scan"
+  | "liff-permanent-link"
+  | "liff-plugins"
+  | "liff-mini-app";
 
-export type ApiKind = "client" | "server" | "event";
+export type ApiKind = "client" | "server" | "event" | "property";
 
 export type ApiRequirement =
   | "initialized"

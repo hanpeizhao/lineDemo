@@ -34,20 +34,20 @@ describe("ApiTestCard", () => {
   afterEach(cleanup);
   it("runs the API and shows its JSON result", async () => {
     render(<ApiTestCard definition={definition} context={context} />);
-    fireEvent.click(screen.getByRole("button", { name: "RUN" }));
+    fireEvent.click(screen.getByRole("button", { name: "运行" }));
     expect(await screen.findByText(/value/)).toBeInTheDocument();
     expect(definition.runner).toHaveBeenCalledWith('{"value":1}', context);
   });
 
   it("disables run when a requirement is not met", () => {
     render(<ApiTestCard definition={definition} context={{ ...context, initialized: false }} />);
-    expect(screen.getByRole("button", { name: "RUN" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "运行" })).toBeDisabled();
     expect(screen.getByText("LIFF 尚未初始化")).toBeInTheDocument();
   });
 
   it("does not show a run button for webhook events", () => {
     render(<ApiTestCard definition={{ ...definition, kind: "event", runner: undefined }} context={context} />);
-    expect(screen.queryByRole("button", { name: "RUN" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "运行" })).not.toBeInTheDocument();
     expect(screen.getByText("Webhook 事件，仅展示 Payload 示例")).toBeInTheDocument();
   });
 });
