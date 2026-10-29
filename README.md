@@ -269,16 +269,41 @@ export default defineConfig({
 
 如果使用用户站点根域名或自定义域名，`base` 通常使用 `/`。
 
-### GitHub Actions
+### GitHub Actions 自动部署
 
-当前仓库尚未包含 GitHub Pages workflow。建议使用 GitHub Pages Actions：
+仓库已包含 [`deploy-pages.yml`](.github/workflows/deploy-pages.yml)。向 `master` 分支 push 后，GitHub Actions 会自动：
 
-1. 在仓库 Settings → Pages 中将 Source 设置为 GitHub Actions。
-2. 添加 workflow，在默认分支 push 时执行 `npm ci` 和 `npm run build`。
-3. 上传 `dist/` 作为 Pages artifact。
-4. 使用 `actions/deploy-pages` 发布。
+1. 安装 Node.js 和 npm 依赖。
+2. 执行 `npm ci`。
+3. 执行 `npm run build` 生成 `dist/`。
+4. 上传 `dist/` 作为 GitHub Pages artifact。
+5. 使用 `actions/deploy-pages` 发布到 GitHub Pages。
 
-部署时需要注入 `VITE_LIFF_ID` 等构建变量。不要把敏感服务端凭证配置到前端构建变量中。
+首次使用时，在仓库 Settings → Pages → Build and deployment → Source 中选择 `GitHub Actions`。
+
+当前 `.env` 已包含公开的 `VITE_LIFF_ID`，因此 workflow 构建时会自动读取它。不要把敏感服务端凭证配置到前端环境变量中。
+
+workflow 使用的权限是：
+
+```yaml
+contents: read
+pages: write
+id-token: write
+```
+
+由于这是 GitHub Pages 项目站点，`vite.config.ts` 使用了：
+
+```ts
+base: "/lineDemo/"
+```
+
+因此默认访问地址是：
+
+```text
+https://你的用户名.github.io/lineDemo/
+```
+
+如果仓库名称发生变化，需要同步修改 `vite.config.ts` 中的 `base`，并重新部署。
 
 ## 注意事项
 
