@@ -67,7 +67,7 @@ lineDemo 是一个基于 React、TypeScript 和 Vite 的 LINE API 能力测试�
 
 ## 环境变量
 
-在项目根目录创建 `.env.local`：
+项目根目录现在使用 `.env` 保存可以提交到 Git 的默认前端配置：
 
 ```env
 # LIFF 或 LINE MINI App 的 LIFF ID
@@ -86,6 +86,8 @@ VITE_IAP_ENABLED=false
 VITE_SERVER_ADAPTER=false
 ```
 
+当前仓库的 `.env` 只有 `VITE_LIFF_ID`，它是 LIFF App 标识，不是 Channel Access Token 或服务端密钥，可以作为项目默认配置提交到 Git。
+
 | 变量 | 说明 |
 | --- | --- |
 | `VITE_LIFF_ID` | 必填。用于 `liff.init()` 的 LIFF ID。 |
@@ -94,7 +96,44 @@ VITE_SERVER_ADAPTER=false
 | `VITE_IAP_ENABLED` | 控制 IAP 客户端 API 是否进入可运行条件。 |
 | `VITE_SERVER_ADAPTER` | 仅表示是否允许进入服务端适配器状态，不会自动提供后端实现。 |
 
-不要把 Channel Access Token、服务端密钥或其他敏感凭证放入 `VITE_` 环境变量。Vite 会在构建时把 `VITE_` 变量写入前端产物，服务端 API 应通过后端代理实现。
+### Vite 如何读取环境变量
+
+项目通过 `import.meta.env` 读取变量，主要使用位置是 [`src/App.tsx`](src/App.tsx) 和 [`src/main.tsx`](src/main.tsx)：
+
+```ts
+const liffId = import.meta.env.VITE_LIFF_ID;
+```
+
+Vite 会根据运行模式加载以下文件：
+
+| 文件 | 作用 | 是否建议提交 |
+| --- | --- | --- |
+| `.env` | 所有模式都会加载的默认配置 | 可以，只能包含公开配置 |
+| `.env.local` | 所有模式的本地覆盖配置 | 不提交 |
+| `.env.development` | `npm run dev` 使用的开发配置 | 视内容决定 |
+| `.env.development.local` | 开发模式的本地覆盖配置 | 不提交 |
+| `.env.production` | `npm run build` 使用的生产配置 | 视内容决定 |
+| `.env.production.local` | 生产构建的本地覆盖配置 | 不提交 |
+
+同一个变量同时存在时，更具体的文件会覆盖通用文件。例如 `.env.local` 会覆盖 `.env`。
+
+当前项目的命令对应关系是：
+
+```text
+npm run dev      → development 模式 → 读取开发环境变量
+npm run build    → production 模式  → 读取生产环境变量并写入 dist/
+npm run preview  → 预览已经构建好的 dist/，不会重新读取并注入变量
+```
+
+只有以 `VITE_` 开头的变量才会被暴露给浏览器端代码。由于这些值会在构建时写入前端产物，以下内容绝对不能放进 `.env` 或任何 `VITE_` 变量：
+
+- Channel Access Token
+- Client Secret
+- 服务端 API 密钥
+- 数据库密码
+- 其他需要保密的凭证
+
+这些敏感信息必须放在后端服务或 GitHub Actions/部署平台的服务端 Secret 中。
 
 ## 本地开发
 
