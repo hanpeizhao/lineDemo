@@ -54,7 +54,7 @@ a { color: #087f5b; font-size: .78rem; font-weight: 700; text-decoration: none; 
   .api-tabs::-webkit-scrollbar { display: none; }
   .api-tab { flex: 0 0 auto; min-height: 44px; padding: 10px 14px; white-space: nowrap; }
   .group-list { gap: 28px; margin-top: 28px; }
-  .api-group, .api-grid, .api-card { min-width: 0; width: 100%; }
+  .api-group, .api-grid, .api-card { min-width: 0; width: 100%; max-width: 100%; }
   .group-heading { margin-bottom: 11px; }
   .group-heading h2 { font-size: 1.25rem; }
   .group-heading p { line-height: 1.5; }
@@ -66,6 +66,7 @@ a { color: #087f5b; font-size: .78rem; font-weight: 700; text-decoration: none; 
   .api-card h3 { overflow-wrap: anywhere; line-height: 1.35; }
   .api-card-header a { align-self: flex-start; padding: 4px 0; }
   .api-card button { width: 100%; min-height: 44px; }
+  .field, .notice, .blocked, .result { min-width: 0; max-width: 100%; }
   .field input, .field textarea { max-width: 100%; }
   .notice, .blocked { overflow-wrap: anywhere; line-height: 1.45; }
   .result { max-width: 100%; overflow: hidden; }

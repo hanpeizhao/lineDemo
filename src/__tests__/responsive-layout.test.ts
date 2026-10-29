@@ -21,6 +21,7 @@ describe("移动端响应式布局契约", () => {
     expect(appCss).toMatch(/\.result\s+pre[^{}]*\{[^}]*overflow-wrap:\s*anywhere/s);
   });
   it("keeps mobile api cards within the tab container", () => {
-    expect(appCss).toMatch(/\.api-group,\s*\.api-grid,\s*\.api-card\s*\{[^}]*min-width:\s*0[^}]*width:\s*100%/s);
+    expect(appCss).toMatch(/\.api-group,\s*\.api-grid,\s*\.api-card\s*\{[^}]*min-width:\s*0[^}]*width:\s*100%[^}]*max-width:\s*100%/s);
+    expect(appCss).toMatch(/\.field,\s*\.notice,\s*\.blocked,\s*\.result\s*\{[^}]*min-width:\s*0[^}]*max-width:\s*100%/s);
   });
 });
