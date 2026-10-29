@@ -150,10 +150,18 @@ const miniAppApiRegistryBase: readonly ApiDefinition[] = [
   },
 ];
 
+function addAvailabilityCheck(api: ApiDefinition): ApiDefinition {
+  if (api.kind !== "client" || api.availability) return api;
+  return {
+    ...api,
+    availability: api.name.replace(/^liff\./, "").replace(/\(\)$/, ""),
+  };
+}
+
 export const miniAppApiRegistry: readonly ApiDefinition[] = [
   ...miniAppApiRegistryBase,
   ...liffApiRegistry,
-];
+].map(addAvailabilityCheck);
 
 export function getApiDefinition(id: string) {
   return miniAppApiRegistry.find((api) => api.id === id);

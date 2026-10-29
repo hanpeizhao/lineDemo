@@ -18,7 +18,34 @@ export default function ApiTestCard({ definition, context }: Props) {
     if (!definition.runner || !runState.canRun || running) return;
     setRunning(true);
     const started = performance.now();
-    try { setResult(await definition.runner(payload, context)); }
+    try {
+      if (definition.availability) {
+        try {
+          const available = await context.liff.isApiAvailable(definition.availability);
+          if (!available) {
+            setResult({
+              ok: false,
+              error: {
+                code: "API_NOT_AVAILABLE",
+                message: `当前环境不支持 ${definition.name}（liff.isApiAvailable(\"${definition.availability}\") 返回 false）`,
+              },
+            });
+            return;
+          }
+        } catch (error) {
+          setResult({
+            ok: false,
+            error: {
+              code: "API_AVAILABILITY_CHECK_FAILED",
+              message: `检查 ${definition.name} 可用性失败：${error instanceof Error ? error.message : String(error)}`,
+              raw: error,
+            },
+          });
+          return;
+        }
+      }
+      setResult(await definition.runner(payload, context));
+    }
     finally { setDurationMs(Math.round(performance.now() - started)); setRunning(false); }
   }
 

@@ -74,6 +74,7 @@ export type ApiDefinition = {
   description: string;
   input: ApiInput;
   requirements: ApiRequirement[];
+  availability?: string;
   autoRun: boolean;
   runner?: ApiRunner;
   example?: unknown;

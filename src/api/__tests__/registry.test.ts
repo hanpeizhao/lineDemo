@@ -25,4 +25,11 @@ describe("LINE MINI App API registry", () => {
     expect(miniAppApiRegistry.every((api) => api.docUrl.startsWith("https://developers.line.biz/"))).toBe(true);
     expect(miniAppApiRegistry.filter((api) => api.kind === "client").every((api) => api.runner)).toBe(true);
   });
+
+  it("adds an isApiAvailable lookup name to every client API", () => {
+    const clientApis = miniAppApiRegistry.filter((api) => api.kind === "client");
+    expect(clientApis.every((api) => api.availability)).toBe(true);
+    expect(miniAppApiRegistry.find((api) => api.id === "liff-share-target-picker")?.availability).toBe("shareTargetPicker");
+    expect(miniAppApiRegistry.find((api) => api.id === "iap-create-payment")?.availability).toBe("iap.createPayment");
+  });
 });
