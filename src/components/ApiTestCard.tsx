@@ -12,13 +12,24 @@ export default function ApiTestCard({ definition, context }: Props) {
   const [result, setResult] = useState<RunResult | null>(null);
   const [durationMs, setDurationMs] = useState<number | null>(null);
   const [running, setRunning] = useState(false);
-  const runState = useMemo(() => getRunState(definition.requirements, context), [definition.requirements, context]);
+  const requirementState = useMemo(() => getRunState(definition.requirements, context), [definition.requirements, context]);
+  const runState = useMemo(() => ({ ...requirementState, canRun: true }), [requirementState]);
 
   async function run() {
-    if (!definition.runner || !runState.canRun || running) return;
+    if (!definition.runner || running) return;
     setRunning(true);
     const started = performance.now();
     try {
+      if (runState.reasons.length > 0) {
+        setResult({
+          ok: false,
+          error: {
+            code: "REQUIREMENT_NOT_MET",
+            message: runState.reasons.join("；"),
+          },
+        });
+        return;
+      }
       if (definition.availability) {
         try {
           const available = await context.liff.isApiAvailable(definition.availability);

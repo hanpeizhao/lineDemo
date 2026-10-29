@@ -40,10 +40,13 @@ describe("ApiTestCard", () => {
     expect(definition.runner).toHaveBeenCalledWith('{"value":1}', context);
   });
 
-  it("disables run when a requirement is not met", () => {
+  it("shows a requirement error without disabling the run button", async () => {
     render(<ApiTestCard definition={definition} context={{ ...context, initialized: false }} />);
-    expect(screen.getByRole("button")).toBeDisabled();
-    expect(screen.getByText(/LIFF/)).toBeInTheDocument();
+    const button = screen.getByRole("button");
+    expect(button).not.toBeDisabled();
+    fireEvent.click(button);
+    expect((await screen.findAllByText(/LIFF/)).length).toBeGreaterThan(0);
+    expect(definition.runner).not.toHaveBeenCalled();
   });
 
   it("does not show a run button for webhook events", () => {
