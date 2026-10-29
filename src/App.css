@@ -54,6 +54,7 @@ a { color: #087f5b; font-size: .78rem; font-weight: 700; text-decoration: none; 
   .api-tabs::-webkit-scrollbar { display: none; }
   .api-tab { flex: 0 0 auto; min-height: 44px; padding: 10px 14px; white-space: nowrap; }
   .group-list { gap: 28px; margin-top: 28px; }
+  .api-group, .api-grid, .api-card { min-width: 0; width: 100%; }
   .group-heading { margin-bottom: 11px; }
   .group-heading h2 { font-size: 1.25rem; }
   .group-heading p { line-height: 1.5; }
