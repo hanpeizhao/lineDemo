@@ -19,7 +19,14 @@ function client(
   return { id, group, name, kind: "client", docUrl: `${docs}#${anchor}`, description, input, requirements, autoRun, runner };
 }
 
-export const liffApiRegistry: readonly ApiDefinition[] = [
+const configuredLiffId = import.meta.env.VITE_LIFF_ID ?? "";
+const liffPropertyRunners: Record<string, ApiDefinition["runner"]> = {
+  "liff-id": async (_payload, context) => ({ ok: true, data: { id: context.liff.id } }),
+  "liff-ready": async (_payload, context) => ({ ok: true, data: { ready: await context.liff.ready } }),
+  "liff-use": async (_payload, context) => ({ ok: true, data: { registered: context.hasCommonProfilePlugin } }),
+};
+
+const liffApiRegistryBase: ApiDefinition[] = [
   { id: "liff-id", group: "liff-properties", name: "liff.id", kind: "property", docUrl: `${docs}#id`, description: "只读的 LIFF App ID 属性。", input: { type: "none" }, requirements: [], autoRun: false },
   { id: "liff-ready", group: "liff-properties", name: "liff.ready", kind: "property", docUrl: `${docs}#ready`, description: "等待 LIFF 首次初始化完成的 Promise 属性。", input: { type: "none" }, requirements: [], autoRun: false },
   { id: "liff-init", group: "liff-initialization", name: "liff.init()", kind: "client", docUrl: `${docs}#initialize-liff-app`, description: "初始化 LIFF App；当前页面已经在启动阶段初始化，重复运行需谨慎。", input: { type: "json", label: "Config", defaultValue: '{\n  "liffId": ""\n}' }, requirements: [], autoRun: false, runner: async (payload, context) => { try { return { ok: true, data: await (context.liff as any).init(JSON.parse(payload)) }; } catch (error) { return { ok: false, error: { message: error instanceof Error ? error.message : String(error), raw: error } }; } } },
@@ -56,3 +63,12 @@ export const liffApiRegistry: readonly ApiDefinition[] = [
   client("liff-i18n-set-lang", "liff-plugins", "liff.i18n.setLang()", "i18n-set-lang", "设置 LIFF SDK UI 的语言。", { type: "text", label: "Language", defaultValue: "en" }, clientRunners.i18nSetLang, [], false),
   client("liff-create-shortcut", "liff-mini-app", "liff.createShortcutOnHomeScreen()", "create-shortcut-on-home-screen", "在设备主屏幕添加 LINE MINI App 快捷方式。", { type: "json", label: "Options", defaultValue: '{\n  "url": ""\n}' }, clientRunners.createShortcutOnHomeScreen, ["initialized", "miniApp", "verifiedMiniApp"], false),
 ];
+
+export const liffApiRegistry: readonly ApiDefinition[] = liffApiRegistryBase.map((api) => {
+  const runner = liffPropertyRunners[api.id];
+  const withRunner = runner ? { ...api, runner } : api;
+  if (withRunner.id === "liff-init" && withRunner.input.type === "json") {
+    return { ...withRunner, input: { ...withRunner.input, defaultValue: JSON.stringify({ liffId: configuredLiffId }, null, 2) } };
+  }
+  return withRunner;
+});

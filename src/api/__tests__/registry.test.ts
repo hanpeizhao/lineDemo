@@ -41,4 +41,46 @@ describe("LINE MINI App API registry", () => {
     expect(miniAppApiRegistry.find((api) => api.id === "liff-get-app-language")?.availability).toBeUndefined();
     expect(miniAppApiRegistry.find((api) => api.id === "iap-create-payment")?.availability).toBeUndefined();
   });
+
+  it("uses the configured LIFF ID as the init default", () => {
+    const init = miniAppApiRegistry.find((api) => api.id === "liff-init");
+
+    expect(init?.input.type).toBe("json");
+    if (init?.input.type !== "json") return;
+    expect(JSON.parse(init.input.defaultValue)).toEqual({
+      liffId: import.meta.env.VITE_LIFF_ID ?? "",
+    });
+  });
+
+  it("runs LIFF property displays without repeating plugin registration", async () => {
+    const properties = ["liff-id", "liff-ready", "liff-use"]
+      .map((id) => miniAppApiRegistry.find((api) => api.id === id));
+    const context = {
+      initialized: true,
+      isInClient: false,
+      isLoggedIn: false,
+      isMiniApp: true,
+      isVerifiedMiniApp: true,
+      hasCommonProfilePlugin: true,
+      iapEnabled: false,
+      hasServerAdapter: false,
+      liff: {
+        id: "test-liff-id",
+        ready: Promise.resolve("ready"),
+        use: () => { throw new Error("liff.use must not be called by the display runner"); },
+      },
+    } as never;
+
+    expect(properties.every((definition) => definition?.runner)).toBe(true);
+    await expect(properties[0]?.runner?.("", context)).resolves.toMatchObject({ ok: true, data: { id: "test-liff-id" } });
+    await expect(properties[1]?.runner?.("", context)).resolves.toMatchObject({ ok: true, data: { ready: "ready" } });
+    await expect(properties[2]?.runner?.("", context)).resolves.toMatchObject({ ok: true, data: { registered: true } });
+  });
+
+  it("shows when the startup plugin was not registered", async () => {
+    const definition = miniAppApiRegistry.find((api) => api.id === "liff-use");
+    const context = { hasCommonProfilePlugin: false } as never;
+
+    await expect(definition?.runner?.("", context)).resolves.toMatchObject({ ok: true, data: { registered: false } });
+  });
 });
