@@ -11,8 +11,8 @@ lineDemo 是一个基于 React、TypeScript 和 Vite 的 LINE API 能力测试�
 - 数据驱动的 API registry，统一维护 API 名称、文档链接、参数示例、运行条件和 runner。
 - 支持 JSON 参数编辑和结果展示。
 - 支持 LIFF SDK 初始化状态、登录状态、LINE 客户端环境和 MINI App 条件提示。
-- API 前置条件不满足时仍可点击运行，错误会显示在结果区，不会调用真实 runner。
-- 对官方支持的 LIFF 能力执行 `liff.isApiAvailable()` 检查；不支持时显示错误，但不禁用运行按钮。
+- API 前置条件仅作参考提示，运行时直接调用真实 runner，展示接口实际返回的结果或错误。
+- 不自动执行 `liff.isApiAvailable()` 前置检查，仍保留独立查询卡片。
 - 移动端响应式布局：窄屏下使用单列卡片、可横向滚动的 Tab 和满宽操作按钮。
 
 ## API 覆盖范围
@@ -197,20 +197,11 @@ API 定义中的 `requirements` 用于提示运行条件，例如：
 - `iapEnabled`：已开启 IAP 能力。
 - `serverAdapter`：已配置服务端适配器。
 
-这些条件由 [`src/api/conditions.ts`](src/api/conditions.ts) 统一计算。条件不满足时，卡片会显示提示，用户仍然可以点击运行；点击后会在结果区显示 `REQUIREMENT_NOT_MET`，并跳过真实 API runner。
+这些条件由 [`src/api/conditions.ts`](src/api/conditions.ts) 统一计算，仅作为参考提示，不拦截调用。点击运行直接执行真实 API runner，由 LIFF 或宿主适配方法返回实际结果或错误；正在执行时仍防止重复点击。
 
 ### `liff.isApiAvailable()`
 
-`liff.isApiAvailable()` 不是任意 LIFF 方法的通用检测器，只能用于官方支持的能力名称。当前项目仅对以下能力配置检测：
-
-| API | 检查名 |
-| --- | --- |
-| `liff.shareTargetPicker()` | `shareTargetPicker` |
-| `liff.scanCodeV2()` | `scanCodeV2` |
-| `liff.scanCode()` | `scanCode` |
-| `liff.createShortcutOnHomeScreen()` | `addToHomeV2` |
-
-其他 API，例如 `liff.getAppLanguage()`、`liff.getProfile()` 和 `liff.iap.*`，会直接调用自身，由 API 返回实际结果或错误。
+运行其他 API 前不再自动调用 `liff.isApiAvailable()`，避免 Demo 提前阻断宿主适配能力。仍可通过独立的 `liff.isApiAvailable()` 测试卡片手动查询官方结果。此调整不修改 LIFF 本身的环境、权限或版本校验。
 
 ### 服务端 API
 

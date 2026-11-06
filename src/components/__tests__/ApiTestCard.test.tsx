@@ -40,13 +40,15 @@ describe("ApiTestCard", () => {
     expect(definition.runner).toHaveBeenCalledWith('{"value":1}', context);
   });
 
-  it("shows a requirement error without disabling the run button", async () => {
-    render(<ApiTestCard definition={definition} context={{ ...context, initialized: false }} />);
+  it("runs even when the page requirements are unmet", async () => {
+    const runner = vi.fn().mockResolvedValue({ ok: true, data: "native-scan-result" });
+    const webContext = { ...context, initialized: false, isInClient: false, isLoggedIn: false };
+    render(<ApiTestCard definition={{ ...definition, requirements: ["initialized", "inLineClient", "loggedIn"], runner }} context={webContext} />);
     const button = screen.getByRole("button");
     expect(button).not.toBeDisabled();
     fireEvent.click(button);
-    expect((await screen.findAllByText(/LIFF/)).length).toBeGreaterThan(0);
-    expect(definition.runner).not.toHaveBeenCalled();
+    expect(await screen.findByText(/native-scan-result/)).toBeInTheDocument();
+    expect(runner).toHaveBeenCalledWith('{"value":1}', webContext);
   });
 
   it("does not show a run button for webhook events", () => {
@@ -55,26 +57,14 @@ describe("ApiTestCard", () => {
     expect(screen.getAllByText(/Webhook/).length).toBeGreaterThan(0);
   });
 
-  it("shows an availability error without disabling the run button", async () => {
-    const runner = vi.fn().mockResolvedValue({ ok: true, data: "unexpected" });
-    const isApiAvailable = vi.fn().mockResolvedValue(false);
-    const unavailableDefinition = {
-      ...definition,
-      availability: "shareTargetPicker",
-      runner,
-    } as ApiDefinition;
-    const unavailableContext = {
-      ...context,
-      liff: { isApiAvailable } as unknown as RunContext["liff"],
-    };
-
-    render(<ApiTestCard definition={unavailableDefinition} context={unavailableContext} />);
-    const button = screen.getByRole("button");
-    expect(button).not.toBeDisabled();
-    fireEvent.click(button);
-
-    expect(await screen.findByText(/shareTargetPicker/)).toBeInTheDocument();
-    expect(isApiAvailable).toHaveBeenCalledWith("shareTargetPicker");
-    expect(runner).not.toHaveBeenCalled();
+  it("does not preflight availability and displays the actual API failure", async () => {
+    const runner = vi.fn().mockResolvedValue({ ok: false, error: { code: "FORBIDDEN", message: "actual LIFF rejection" } });
+    const isApiAvailable = vi.fn(() => { throw new Error("must not preflight"); });
+    const webContext = { ...context, isInClient: false, liff: { ...context.liff, isApiAvailable } };
+    render(<ApiTestCard definition={{ ...definition, requirements: ["inLineClient"], runner }} context={webContext} />);
+    fireEvent.click(screen.getByRole("button"));
+    expect(await screen.findByText(/actual LIFF rejection/)).toBeInTheDocument();
+    expect(isApiAvailable).not.toHaveBeenCalled();
+    expect(runner).toHaveBeenCalledOnce();
   });
 });

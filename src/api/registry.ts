@@ -150,22 +150,10 @@ const miniAppApiRegistryBase: readonly ApiDefinition[] = [
   },
 ];
 
-const apiAvailabilityById: Record<string, string> = {
-  "liff-share-target-picker": "shareTargetPicker",
-  "liff-scan-code-v2": "scanCodeV2",
-  "liff-scan-code": "scanCode",
-  "liff-create-shortcut": "addToHomeV2",
-};
-
-function addAvailabilityCheck(api: ApiDefinition): ApiDefinition {
-  const availability = apiAvailabilityById[api.id];
-  return availability ? { ...api, availability } : api;
-}
-
 export const miniAppApiRegistry: readonly ApiDefinition[] = [
   ...miniAppApiRegistryBase,
   ...liffApiRegistry,
-].map(addAvailabilityCheck);
+];
 
 export function getApiDefinition(id: string) {
   return miniAppApiRegistry.find((api) => api.id === id);

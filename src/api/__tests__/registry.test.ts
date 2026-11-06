@@ -26,22 +26,6 @@ describe("LINE MINI App API registry", () => {
     expect(miniAppApiRegistry.filter((api) => api.kind === "client").every((api) => api.runner)).toBe(true);
   });
 
-  it("only adds supported isApiAvailable lookup names", () => {
-    const checkedIds = miniAppApiRegistry
-      .filter((api) => api.availability)
-      .map((api) => api.id);
-
-    expect(checkedIds).toEqual([
-      "liff-share-target-picker",
-      "liff-scan-code-v2",
-      "liff-scan-code",
-      "liff-create-shortcut",
-    ]);
-    expect(miniAppApiRegistry.find((api) => api.id === "liff-share-target-picker")?.availability).toBe("shareTargetPicker");
-    expect(miniAppApiRegistry.find((api) => api.id === "liff-get-app-language")?.availability).toBeUndefined();
-    expect(miniAppApiRegistry.find((api) => api.id === "iap-create-payment")?.availability).toBeUndefined();
-  });
-
   it("uses the configured LIFF ID as the init default", () => {
     const init = miniAppApiRegistry.find((api) => api.id === "liff-init");
 
